@@ -1,0 +1,458 @@
+---
+swagger: "2.0"
+info:
+  x-ibm-name: "hoconverttemprest"
+  title: "HO_ConvertTemp_Rest"
+  version: "1.0.0"
+schemes:
+- "https"
+host: "$(catalog.host)"
+basePath: "/hoconverttemprest"
+consumes:
+- "application/json"
+produces:
+- "application/json"
+securityDefinitions:
+  clientIdHeader:
+    type: "apiKey"
+    in: "header"
+    name: "X-IBM-Client-Id"
+security:
+- {}
+x-ibm-configuration:
+  testable: true
+  enforced: true
+  cors:
+    enabled: true
+  assembly:
+    execute:
+    - map:
+        title: "map"
+        inputs:
+          datosEntrada:
+            schema:
+              $ref: "#/definitions/dataInput"
+            variable: "request.body"
+            content: "application/json"
+        outputs:
+          output:
+            schema:
+              $ref: "#/x-ibm-configuration/targets/ConvertTemp/definitions/converttempInput"
+            variable: "message.body"
+            content: "application/xml"
+        actions:
+        - set: "output.Envelope.Body.converttemp.arg0.TEMPIN"
+          from: "datosEntrada.temperatura"
+        version: "1.0.0"
+    - invoke:
+        target-url: "https://api.us.apiconnect.ibmcloud.com/playgroundbluemix-dev/sb/ConvertTemp"
+        title: "Invoca API_Dummy"
+        description: "Invoca API Dummy convertir temperatura"
+        verb: "POST"
+        output: "respuesta"
+    - map:
+        title: "map"
+        inputs:
+          resptasoap:
+            schema:
+              $ref: "#/x-ibm-configuration/targets/ConvertTemp/definitions/converttempOutput"
+            variable: "respuesta.body"
+            content: "application/xml"
+        outputs:
+          output:
+            schema:
+              $ref: "#/definitions/dataOutput"
+            variable: "message.body"
+            content: "application/json"
+        actions:
+        - set: "output.temperaturaOut"
+          from: "resptasoap.Envelope.Body.converttempResponse.return.TEMPOUT"
+        version: "1.0.0"
+  phase: "realized"
+  targets:
+    ConvertTemp:
+      swagger: "2.0"
+      info:
+        title: "ConvertTemp"
+        description: ""
+        x-ibm-name: "converttemp-1"
+        version: "1.0.0"
+      schemes:
+      - "https"
+      basePath: "/ConvertTemp"
+      produces:
+      - "application/xml"
+      consumes:
+      - "text/xml"
+      securityDefinitions:
+        clientID:
+          type: "apiKey"
+          name: "X-IBM-Client-Id"
+          in: "header"
+          description: ""
+      security:
+      - clientID: []
+      x-ibm-configuration:
+        type: "wsdl"
+        wsdl-definition:
+          wsdl: "5a12dbc00cf22a4aef51cce1"
+          service: "ConvertTemp"
+          port: "ConvertTempServicesPort"
+          soap-version: "1.1"
+        assembly:
+          execute:
+          - proxy:
+              title: "proxy"
+              target-url: "https://api.us.apiconnect.ibmcloud.com/playgroundbluemix-dev/sb/ConvertTemp"
+        gateway: "datapower-gateway"
+        enforced: true
+        testable: true
+        phase: "realized"
+        cors:
+          enabled: true
+      paths:
+        /converttemp:
+          post:
+            summary: "Operation converttemp"
+            description: ""
+            operationId: "converttemp"
+            x-ibm-soap:
+              soap-action: ""
+              soap-operation: "{http://converttemp.wsbeans.iseries/}converttemp"
+            parameters:
+            - in: "body"
+              name: "body"
+              required: true
+              schema:
+                $ref: "#/x-ibm-configuration/targets/ConvertTemp/definitions/converttempInput"
+            responses:
+              default:
+                description: ""
+                schema:
+                  $ref: "#/x-ibm-configuration/targets/ConvertTemp/definitions/converttempOutput"
+        /converttemp_XML:
+          post:
+            summary: "Operation converttemp_XML"
+            description: ""
+            operationId: "converttemp_XML"
+            x-ibm-soap:
+              soap-action: ""
+              soap-operation: "{http://converttemp.wsbeans.iseries/}converttemp_XML"
+            parameters:
+            - in: "body"
+              name: "body"
+              required: true
+              schema:
+                $ref: "#/x-ibm-configuration/targets/ConvertTemp/definitions/converttemp_XMLInput"
+            responses:
+              default:
+                description: ""
+                schema:
+                  $ref: "#/x-ibm-configuration/targets/ConvertTemp/definitions/converttemp_XMLOutput"
+      definitions:
+        Security:
+          xml:
+            namespace: "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd"
+            prefix: "wsse"
+          type: "object"
+          properties:
+            UsernameToken:
+              xml:
+                namespace: "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd"
+                prefix: "wsse"
+              type: "object"
+              properties:
+                Username:
+                  xml:
+                    namespace: "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd"
+                    prefix: "wsse"
+                  type: "string"
+                Password:
+                  xml:
+                    namespace: "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd"
+                    prefix: "wsse"
+                  type: "string"
+                Nonce:
+                  xml:
+                    namespace: "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd"
+                    prefix: "wsse"
+                  type: "string"
+                  properties:
+                    EncodingType:
+                      xml:
+                        namespace: ""
+                        attribute: true
+                      type: "string"
+                Created:
+                  xml:
+                    namespace: "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd"
+                    prefix: "wsu"
+                  type: "string"
+            Timestamp:
+              xml:
+                namespace: "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd"
+                prefix: "wsu"
+              type: "object"
+              properties:
+                Created:
+                  xml:
+                    namespace: "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd"
+                    prefix: "wsu"
+                  type: "string"
+                Expires:
+                  xml:
+                    namespace: "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd"
+                    prefix: "wsu"
+                  type: "string"
+                Id:
+                  xml:
+                    namespace: "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd"
+                    prefix: "wsu"
+                    attribute: true
+                  type: "string"
+        converttempInput:
+          type: "object"
+          properties:
+            Envelope:
+              xml:
+                prefix: "soapenv"
+                namespace: "http://schemas.xmlsoap.org/soap/envelope/"
+              type: "object"
+              properties:
+                Header:
+                  $ref: "#/x-ibm-configuration/targets/ConvertTemp/definitions/converttempHeader"
+                Body:
+                  type: "object"
+                  properties:
+                    converttemp:
+                      $ref: "#/x-ibm-configuration/targets/ConvertTemp/definitions/converttemp_tns"
+                  required:
+                  - "converttemp"
+              required:
+              - "Body"
+          required:
+          - "Envelope"
+          example: "\n<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\"\
+            >\n <soapenv:Header>\n  <wsse:Security xmlns:wsse=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd\"\
+            \ xmlns:wsu=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\"\
+            >\n   <wsse:UsernameToken>\n    <wsse:Username>string</wsse:Username>\n\
+            \    <wsse:Password>string</wsse:Password>\n    <wsse:Nonce EncodingType=\"\
+            string\">string</wsse:Nonce>\n    <wsu:Created>string</wsu:Created>\n\
+            \   </wsse:UsernameToken>\n   <wsu:Timestamp wsu:Id=\"string\">\n    <wsu:Created>string</wsu:Created>\n\
+            \    <wsu:Expires>string</wsu:Expires>\n   </wsu:Timestamp>\n  </wsse:Security>\n\
+            \ </soapenv:Header>\n <soapenv:Body>\n  <tns:converttemp xmlns:tns=\"\
+            http://converttemp.wsbeans.iseries/\"><!-- mandatory -->\n   <arg0><!--\
+            \ mandatory -->\n    <TEMPIN><!-- mandatory -->string</TEMPIN>\n   </arg0>\n\
+            \  </tns:converttemp>\n </soapenv:Body>\n</soapenv:Envelope>"
+        converttempHeader:
+          type: "object"
+          properties:
+            Security:
+              $ref: "#/x-ibm-configuration/targets/ConvertTemp/definitions/Security"
+        converttempOutput:
+          type: "object"
+          properties:
+            Envelope:
+              xml:
+                prefix: "soapenv"
+                namespace: "http://schemas.xmlsoap.org/soap/envelope/"
+              type: "object"
+              properties:
+                Body:
+                  type: "object"
+                  properties:
+                    converttempResponse:
+                      $ref: "#/x-ibm-configuration/targets/ConvertTemp/definitions/converttempResponse_tns"
+              required:
+              - "Body"
+          required:
+          - "Envelope"
+          example: "\n<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\"\
+            >\n <soapenv:Body>\n  <tns:converttempResponse xmlns:tns=\"http://converttemp.wsbeans.iseries/\"\
+            >\n   <return><!-- mandatory -->\n    <TEMPOUT><!-- mandatory -->string</TEMPOUT>\n\
+            \   </return>\n  </tns:converttempResponse>\n </soapenv:Body>\n</soapenv:Envelope>"
+        converttemp_XMLInput:
+          type: "object"
+          properties:
+            Envelope:
+              xml:
+                prefix: "soapenv"
+                namespace: "http://schemas.xmlsoap.org/soap/envelope/"
+              type: "object"
+              properties:
+                Header:
+                  $ref: "#/x-ibm-configuration/targets/ConvertTemp/definitions/converttemp_XMLHeader"
+                Body:
+                  type: "object"
+                  properties:
+                    converttemp_XML:
+                      $ref: "#/x-ibm-configuration/targets/ConvertTemp/definitions/converttemp_XML_tns"
+                  required:
+                  - "converttemp_XML"
+              required:
+              - "Body"
+          required:
+          - "Envelope"
+          example: "\n<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\"\
+            >\n <soapenv:Header>\n  <wsse:Security xmlns:wsse=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd\"\
+            \ xmlns:wsu=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\"\
+            >\n   <wsse:UsernameToken>\n    <wsse:Username>string</wsse:Username>\n\
+            \    <wsse:Password>string</wsse:Password>\n    <wsse:Nonce EncodingType=\"\
+            string\">string</wsse:Nonce>\n    <wsu:Created>string</wsu:Created>\n\
+            \   </wsse:UsernameToken>\n   <wsu:Timestamp wsu:Id=\"string\">\n    <wsu:Created>string</wsu:Created>\n\
+            \    <wsu:Expires>string</wsu:Expires>\n   </wsu:Timestamp>\n  </wsse:Security>\n\
+            \ </soapenv:Header>\n <soapenv:Body>\n  <tns:converttemp_XML xmlns:tns=\"\
+            http://converttemp.wsbeans.iseries/\"><!-- mandatory -->\n   <arg0><!--\
+            \ mandatory -->\n    <TEMPIN><!-- mandatory -->string</TEMPIN>\n   </arg0>\n\
+            \  </tns:converttemp_XML>\n </soapenv:Body>\n</soapenv:Envelope>"
+        converttemp_XMLHeader:
+          type: "object"
+          properties:
+            Security:
+              $ref: "#/x-ibm-configuration/targets/ConvertTemp/definitions/Security"
+        converttemp_XMLOutput:
+          type: "object"
+          properties:
+            Envelope:
+              xml:
+                prefix: "soapenv"
+                namespace: "http://schemas.xmlsoap.org/soap/envelope/"
+              type: "object"
+              properties:
+                Body:
+                  type: "object"
+                  properties:
+                    converttemp_XMLResponse:
+                      $ref: "#/x-ibm-configuration/targets/ConvertTemp/definitions/converttemp_XMLResponse_tns"
+              required:
+              - "Body"
+          required:
+          - "Envelope"
+          example: "\n<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\"\
+            >\n <soapenv:Body>\n  <tns:converttemp_XMLResponse xmlns:tns=\"http://converttemp.wsbeans.iseries/\"\
+            >\n   <return><!-- mandatory -->string</return>\n  </tns:converttemp_XMLResponse>\n\
+            \ </soapenv:Body>\n</soapenv:Envelope>"
+        converttemp_tns:
+          xml:
+            namespace: "http://converttemp.wsbeans.iseries/"
+            prefix: "tns"
+          type: "object"
+          properties:
+            arg0:
+              $ref: "#/x-ibm-configuration/targets/ConvertTemp/definitions/converttempInput_tns"
+          required:
+          - "arg0"
+          example: "\n<tns:converttemp xmlns:tns=\"http://converttemp.wsbeans.iseries/\"\
+            >\n <arg0><!-- mandatory -->\n  <TEMPIN><!-- mandatory -->string</TEMPIN>\n\
+            \ </arg0>\n</tns:converttemp>"
+        converttempResponse_tns:
+          xml:
+            namespace: "http://converttemp.wsbeans.iseries/"
+            prefix: "tns"
+          type: "object"
+          properties:
+            return:
+              $ref: "#/x-ibm-configuration/targets/ConvertTemp/definitions/converttempResult_tns"
+          required:
+          - "return"
+          example: "\n<tns:converttempResponse xmlns:tns=\"http://converttemp.wsbeans.iseries/\"\
+            >\n <return><!-- mandatory -->\n  <TEMPOUT><!-- mandatory -->string</TEMPOUT>\n\
+            \ </return>\n</tns:converttempResponse>"
+        converttemp_XML_tns:
+          xml:
+            namespace: "http://converttemp.wsbeans.iseries/"
+            prefix: "tns"
+          type: "object"
+          properties:
+            arg0:
+              $ref: "#/x-ibm-configuration/targets/ConvertTemp/definitions/converttempInput_tns"
+          required:
+          - "arg0"
+          example: "\n<tns:converttemp_XML xmlns:tns=\"http://converttemp.wsbeans.iseries/\"\
+            >\n <arg0><!-- mandatory -->\n  <TEMPIN><!-- mandatory -->string</TEMPIN>\n\
+            \ </arg0>\n</tns:converttemp_XML>"
+        converttemp_XMLResponse_tns:
+          xml:
+            namespace: "http://converttemp.wsbeans.iseries/"
+            prefix: "tns"
+          type: "object"
+          properties:
+            return:
+              type: "string"
+              xml:
+                namespace: ""
+                prefix: ""
+          required:
+          - "return"
+          example: "\n<tns:converttemp_XMLResponse xmlns:tns=\"http://converttemp.wsbeans.iseries/\"\
+            >\n <return><!-- mandatory -->string</return>\n</tns:converttemp_XMLResponse>"
+        converttempInput_tns:
+          xml:
+            namespace: ""
+            prefix: ""
+          type: "object"
+          properties:
+            TEMPIN:
+              type: "string"
+              xml:
+                namespace: ""
+                prefix: ""
+          required:
+          - "TEMPIN"
+          x-xsi-type: "converttempInput"
+          x-xsi-type-xml:
+            namespace: "http://converttemp.wsbeans.iseries/"
+            prefix: "tns"
+          x-xsi-type-uniquename: "converttempInput_tns"
+        converttempResult_tns:
+          xml:
+            namespace: ""
+            prefix: ""
+          type: "object"
+          properties:
+            TEMPOUT:
+              type: "string"
+              xml:
+                namespace: ""
+                prefix: ""
+          required:
+          - "TEMPOUT"
+          x-xsi-type: "converttempResult"
+          x-xsi-type-xml:
+            namespace: "http://converttemp.wsbeans.iseries/"
+            prefix: "tns"
+          x-xsi-type-uniquename: "converttempResult_tns"
+paths:
+  /temperatura:
+    post:
+      responses:
+        200:
+          description: "200 OK"
+          schema:
+            $ref: "#/definitions/dataOutput"
+      parameters:
+      - name: "datosEntrada"
+        required: false
+        in: "body"
+        schema:
+          $ref: "#/definitions/dataInput"
+definitions:
+  dataOutput:
+    properties:
+      temperaturaOut:
+        type: "string"
+        description: "Temperatura salida"
+        example: "58"
+    additionalProperties: false
+    description: "Corresponde  a los datos de respuesta"
+    required:
+    - "temperaturaOut"
+  dataInput:
+    properties:
+      temperatura:
+        type: "string"
+        description: "Temperatura a convertir"
+        example: "43"
+    additionalProperties: false
+    description: "Corresponde a los datos de request"
+tags: []
